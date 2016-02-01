@@ -1,1 +1,20 @@
 Install Hadoop-2.7.1 on Ubuntu 15.10
+
+官网提供了下载，有源码和编译好的版本，但是编译好的版本中native库是32位的，所以64为系统要自己下载源码编译。
+参看这里：http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/NativeLibraries.html#Native_Shared_Libraries
+
+下载好的源码中有BUILDING.txt，按照里面的要求搭好环境：
+
+1.安装jdk 推荐的是1.7，我安装的是
+java version "1.8.0_71"
+Java(TM) SE Runtime Environment (build 1.8.0_71-b15)
+Java HotSpot(TM) 64-Bit Server VM (build 25.71-b15, mixed mode)
+去官网下载jdk解压后放到方便的位置，java每个用户都有用，所以我放到/usr/lib/java/jdk1.8.0_71.
+编辑/etc/environment:
+JAVA_HOME="/usr/lib/java/jdk1.8.0_71"
+CLASSPATH=".:/usr/lib/java/jdk1.8.0_71/lib"
+PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/java/jdk1.8.0_71/bin"
+设置默认jdk:
+sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk1.7.0_67/bin/java 300  
+sudo update-alternatives --install /usr/bin/javac javac /usr/lib/jvm/jdk1.7.0_67/bin/javac 300  
+测试一下：java -version
