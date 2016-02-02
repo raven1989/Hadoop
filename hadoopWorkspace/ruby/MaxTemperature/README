@@ -1,0 +1,16 @@
+Hadoop 的 Streaming
+
+将输入文件传到hadoop上：
+$ hadoop fs -mkdir -p MaxTemperature/ruby
+$ hadoop fs -put input/sample MaxTemperature/ruby
+
+为了方便：
+alias hadoops='hadoop jar $HADOOP_INSTALL/share/hadoop/tools/lib/hadoop-streaming-2.7.1.jar $*'
+
+在集群上运行要加上-file把文件传上去:
+$ hadoops -input MaxTemperature/ruby/sample \
+          -output MaxTemperature/ruby/output \
+          -mapper max_temperature_map.rb \
+          -reducer max_temperature_reduce.rb \
+          -file max_temperature_map.rb \
+          -file max_temperature_reduce.rb

@@ -1,0 +1,34 @@
+为了方便：
+export HADOOP_CLASSPATH=.:$JAVA_HOME/lib/tools.jar;
+alias hadoopc='hadoop com.sun.tools.javac.Main $*'
+
+执行：
+编译出class文件
+$ hadoopc src/*.java  
+
+如果是Standalone模式，直接在本地文件系统执行：
+注意HADOOP_CLASSPATH中设置了.，所以只要在class所在的目录执行就不用额外指定路径了，否则要执行
+export HADOOP_CLASSPATH=$HADOOP_CLASSPATH:$your_classes_path
+$ hadoop MaxTemperature input/sample output
+MaxTemperature指MaxTemperature.class， 我们没有知名另外两个类MaxTemperatureMapper和MaxTemperatureReducer在哪里，hadoop会根据HADOOP_CLASSPATH去找；
+结果在output中，这个文件夹在执行之前不能存在，否则会失败。
+还会收到一个warn：
+WARN mapreduce.JobResourceUploader: No job jar file set.  User classes may not be found. See Job or Job#setJar(String).
+在这个模式下不影响。
+
+
+如果是Psuedo-Distributed模式:
+
+1.要把输入文件拷贝到hdfs文件系统：
+$ hadoop fs -ls
+$ hadoop fs -mkdir -p MaxTemperature/java
+$ hadoop fs -put input/* MaxTemperature/java
+
+2.这里我们有三个class，直接运行hadoop MaxTemperature MaxTemperature/java/sample MaxTemperature/java/output会提示找不到另外两个类；
+所以打成jar包:
+  $ jar cvf mc.jar MaxTemperature*.class 
+再用hadoop jar跑一次，还是提示找不到两外两个class。这里就要处理上面提到的warn了：
+在main函数中添加一句：
+  conf.setJar("mc.jar");
+重新编译打包，再执行：
+  $ hadoop jar mc.jar MaxTemperature MaxTemperature/java/sample MaxTemperature/java/output 

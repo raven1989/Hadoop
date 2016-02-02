@@ -1,0 +1,4 @@
+按照o'relly的hadoop权威指南学习，书中使用的是hadoop 0.20.2。
+我安装的是hadoop 2.7.1，版本相差甚远，很多地方已经发生变化，不同的地方会在相应的地方之出来。
+贴个官方的参考文档：
+http://hadoop.apache.org/docs/stable/index.html

@@ -1,0 +1,46 @@
+Hadoop pipes
+
+编译程序：
+CPPFLAGS = -m64 -I$(HADOOP_INSTALL)/include
+$(CC) $(CPPFLAGS) $< -Wall -L$(HADOOP_INSTALL)/lib/native -L/lib/x86_64-linux-gnu/ -lhadooppipes -lhadooputils -lpthread -lcrypto -g -O2 -o $@
+要加上-lcrypto，这个o'reilly书中没有提到。
+
+上传文件：
+$ hadoop fs -mkdir MaxTemperature/cpp
+$ hadoop fs -put max_temperature MaxTemperature/cpp
+$ hadoop fs -put input/sample MaxTemperature/cpp
+
+运行：
+o'reilly给出0.20.2版本的执行命令是：
+$ hadoop pipes \
+         -D hadoop.pipes.java.recordreader=true \
+         -D hadoop.pipes.java.recordwriter=true \
+         -input sample \
+         -output output \
+         -program max_temperature
+这个命令在新版本已经过期了，参看这里：
+http://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/DeprecatedProperties.html
+
+代替的命令是：
+$ mapred pipes \
+         -jobconf mapreduce.pipes.isjavarecordreader=true,\
+         mapreduce.pipes.isjavarecordwriter=true \
+         -input MaxTemperature/cpp/sample \
+         -output MaxTemperature/cpp/output \
+         -program MaxTemperature/cpp/max_temperature
+参看这里：
+http://hadoop.apache.org/docs/stable/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapredCommands.html#pipes
+会收到一个warn提示jobconf过期，但不影响运行，根据提示换成-D：
+$ mapred pipes \
+         -D mapreduce.pipes.isjavarecordreader=true \
+         -D mapreduce.pipes.isjavarecordwriter=true \
+         -input MaxTemperature/cpp/sample \
+         -output MaxTemperature/cpp/output \
+         -program MaxTemperature/cpp/max_temperature
+
+也可以配置到conf中运行：
+$ mapred pipes \
+         -conf max_temperature.xml
+         -input MaxTemperature/cpp/sample \
+         -output MaxTemperature/cpp/output \
+

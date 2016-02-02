@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<configuration>
+  <property>
+    <name>mapreduce.pipes.executable</name>
+    <value>/user/ryan/MaxTemperature/max_temperature</value>
+  </property>
+  <property>
+    <name>mapreduce.pipes.isjavarecordreader</name>
+    <value>true</value>
+  </property>
+  <property>
+    <name>mapreduce.pipes.isjavarecordwriter</name>
+    <value>true</value>
+  </property>
+</configuration>
