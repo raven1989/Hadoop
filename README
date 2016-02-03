@@ -118,3 +118,7 @@ $ hadoop namenode -format
 $ ./start-dfs.sh
 $ ./start-yarn.sh
 会启动三个：一个namenode，一个secondary namenode，一个datanode，log在logs/下，看看有没有错误。
+创建hdfs目录:
+$ hdfs dfs -mkdir /user
+$ hdfs dfs -mkdir /user/ryan
+http://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/HDFSCommands.html

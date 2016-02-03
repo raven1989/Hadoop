@@ -1,0 +1,2 @@
+$ hadoopc FileCopyWithProgress.java 
+$ hadoop FileCopyWithProgress greetings hdfs://localhost:9000/user/ryan/greetings.copy

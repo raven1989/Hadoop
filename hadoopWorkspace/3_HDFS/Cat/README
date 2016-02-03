@@ -1,0 +1,9 @@
+$ hadoopc URLCat.java
+$ hadoop URLCat hdfs://localhost:9000/user/ryan/greetings
+
+$ hadoopc FileSystemCat.java 
+$ hadoop FileSystemCat hdfs://localhost:9000/user/ryan/greetings
+
+$ hadoopc FileSystemDoubleCat.java
+$ hadoop FileSystemCatDouble hdfs://localhost:9000/user/ryan/greetings
+
