@@ -1,0 +1,9 @@
+$ hadoop ListStatus hdfs://localhost:9000/user/ryan
+
+$ hadoop ListStatusByGlobbingWithFilter hdfs://localhost:9000/*/*/* .*.copy
+
+$ hadoop CoherencyDemo hdfs://localhost:9000/user/ryan/coherency
+
+$ hadoop archive -archiveName files.har -p hdfs://localhost:9000/user/ryan hdfs://localhost:9000/user/ryan
+$ hadoop fs -ls -R har://hdfs-localhost:9000/user/ryan/files.har/greetings
+$ hadoop fs -rm -R hdfs://localhost:9000/user/ryan/files.har
