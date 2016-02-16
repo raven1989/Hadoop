@@ -1,3 +1,12 @@
 $ echo "Text" | hadoop StreamCompressor org.apache.hadoop.io.compress.GzipCodec | gunzip
 
 $ hadoop FileDecompressor file.gz
+
+$ echo "Content" | hadoop PooledStreamCompressor org.apache.hadoop.io.compress.GzipCodec | gunzip
+
+$ gzip -c sample > sample.gz
+$ hadoopc MaxTemperature*.java
+$ jar cvf mt.jar MaxTemperature*.class
+$ hadoop jar mt.jar MaxTemperatureWithCompression sample.gz hdfs://localhost:9000/user/ryan/MaxTemperature/output
+$ hadoop fs -get hdfs://localhost:9000/user/ryan/MaxTemperature/output/part-00000.gz .
+$ gunzip -c part-00000.gz

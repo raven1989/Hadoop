@@ -1,0 +1,2 @@
+$ hadoopc WritableBasics.java
+$ hadoop WritableBasics
