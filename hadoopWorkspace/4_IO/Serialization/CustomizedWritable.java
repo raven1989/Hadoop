@@ -2,6 +2,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.hadoop.io.RawComparator;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.io.WritableComparator;
@@ -98,10 +99,11 @@ public class CustomizedWritable {
       }
     }
     
-    //这样的static在什么时候运行？
-    static {
-      WritableComparator.define(TextPair.class, new TextPairComparator());
-    }
+  }
+  
+  //这样的static在什么时候运行？
+  static {
+    WritableComparator.define(TextPair.class, new TextPairComparator());
   }
 
   public static void main(String[] args) throws Exception {
@@ -118,9 +120,8 @@ public class CustomizedWritable {
     System.out.println("Content: "+ tp3.toString());
     byte[] b3 = WritableBasics.serialize(tp3);
     
-    //WritableComparator.define(TextPair.class, new TextPairComparator());
-    //TextPairComparator hehe = new TextPairComparator();
-    TextPairComparator comparator = (TextPairComparator) WritableComparator.get(TextPair.class);
+    @SuppressWarnings("unchecked")
+    RawComparator<TextPairComparator> comparator = WritableComparator.get(TextPair.class);
     System.out.println("Compare: "+ comparator.compare(b1, 0, b1.length, b3, 0, b3.length));
 
   }
