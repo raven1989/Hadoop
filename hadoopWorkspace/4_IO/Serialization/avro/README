@@ -1,0 +1,15 @@
+$ java -jar $AVRO_HOME/avro-tools-1.7.4.jar compile schema Pair.avsc .
+$ hadoopc AvroGeneratePair.java Pair.java
+$ jar cvf agp.jar AvroGeneratePair.class Pair.class
+$ hadoop jar agp.jar AvroGeneratePair
+
+安装python的avro:
+$ sudo easy_install avro
+
+$ python write_pairs.py pairs.avro
+a,1
+b,2
+b,3
+c,4
+Control+d
+$ cat pairs.avro
