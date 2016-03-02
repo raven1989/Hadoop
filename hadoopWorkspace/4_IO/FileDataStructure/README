@@ -1,0 +1,19 @@
+$ hadoop SequenceFileWriterDemo number.seq
+$ hadoop SequenceFileReaderDemo number.seq
+$ hadoop fs -text numbers.seq
+
+$ hadoop MapFileWriterDemo numbers.map
+$ hadoop fs -text numbers.map/data
+$ hadoop fs -text numbers.map/index
+
+#把SequenceFile变成MapFile：
+#1.首先把SequenceFile排序
+$ hadoop jar $HADOOP_INSTALL/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.jar sort -r 1 -outKey org.apache.hadoop.io.IntWritable -outValue org.apache.hadoop.io.Text numbers.seq numbersFix.map
+
+#2.重命名输出为data文件
+$ hadoop fs -mv numbersFix.map/part-r-00000 numbersFix.map/data
+
+#3.重建索引
+$ hadoop MapFileFixer numbersFix.map
+
+#MapFileFixer一般是用来修复MapFile索引的

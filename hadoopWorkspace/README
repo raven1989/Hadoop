@@ -2,3 +2,11 @@
 我安装的是hadoop 2.7.1，版本相差甚远，很多地方已经发生变化，不同的地方会在相应的地方之出来。
 贴个官方的参考文档：
 http://hadoop.apache.org/docs/stable/index.html
+
+3,4章使用的是Standalone模式，因为我忘记配置了（手动再见），
+但是运行没有区别，除了个别命令中直接使用本地文件的地方需要修改；
+因为core-site.xml中配置的默认fs是hdfs://localhost:9000，而Standalone模式是本地文件系统：
+举个例子：
+$ hadoop MapFileReaderDemo numbers.map 
+改成
+$ hadoop MapFileReaderDemo file://`pwd`/numbers.map

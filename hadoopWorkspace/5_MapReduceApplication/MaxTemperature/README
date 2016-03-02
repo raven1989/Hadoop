@@ -1,0 +1,11 @@
+#1.单元测试
+#MaxTemperatureTest 直接在IDE中运行，run as junit test
+
+#2.本地测试
+#把测试程序写成一个Tool，通过设置mapred.job.tracker=local来实现本地运行；
+#本地运行无论reducer设几个都只有一个
+$ jar cvf mtd.jar MaxTemperatureDriver.class MaxTemperatureMapper.class MaxTemperatureReducer.class
+#hadoop-local.xml将默认文件系统设置成本地文件系统，方便测试
+$ hadoop jar mtd.jar MaxTemperatureDriver -conf ../hadoop-local.xml -D mapred.job.tracker=local input/sample output/MaxTemperatureDriver
+#或者是用GenericOptionsParser提供的-fs和-jt选项
+$ hadoop jar mtd.jar MaxTemperatureDriver -fs file:/// -jt local input/sample output/MaxTemperatureDriver
