@@ -1,0 +1,1 @@
+$ hadoop jar pbs.jar PartitionByStationUsingMultipleOutputs -conf ../hadoop-local.xml input/sample output

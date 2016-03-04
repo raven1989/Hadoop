@@ -1,0 +1,15 @@
+$ jar cvf s2sf.jar WholeFile*.class SmallFilesToSequenceFileConverter.class
+$ hadoop jar s2sf.jar SmallFilesToSequenceFileConverter -conf ../hadoop-local.xml -D mapred.reduce.tasks=2 input output
+#可以看到有几个文件就有一个map，当文件数量为5个的时候我的机器特别卡，为3个的时候很快，可见分片对效率的影响;
+    Launched map tasks=3
+    Launched reduce tasks=2
+#使用了两个reducer，所以结果有两个文件
+$ hadoop fs -conf ../hadoop-local.xml -text output/part-00000
+$ hadoop fs -conf ../hadoop-local.xml -text output/part-00001
+
+#hadoop大文件分片，小文件不分片，因而这里的小文件应该使用CombineFileInputFormat进行优化，组合小文件以减少分片。
+$ jar cvf cs2sf.jar Combine*.class WholeFile*.class
+$ hadoop jar cs2sf.jar CombineSmallFilesToSequenceFileConverter -conf ../hadoop-local.xml -D mapred.reduce.tasks=2 input combine_output
+#可以看到map只有1个，可知只有一个分片
+    Launched map tasks=1
+    Launched reduce tasks=2
