@@ -1,0 +1,15 @@
+$ hadoops -conf ../../hadoop-local.xml -D mapreduce.job.maps=4 -D mapreduce.job.reduces=2 -D stream.num.map.output.key.fields=2   -D mapred.text.key.partitioner.options=-k1,1   -D mapred.output.key.comparator.class=org.apache.hadoop.mapred.lib.KeyFieldBasedComparator   -D mapred.text.key.comparator.options="-k1n -k2nr"   -input ../input/sample   -output output   -mapper 'python secondary_sort_map.py'   -partitioner org.apache.hadoop.mapred.lib.KeyFieldBasedPartitioner   -reducer 'python secondary_sort_reduce.py'   -file secondary_sort_map.py -file secondary_sort_reduce.py
+
+#解释一下：
+$ hadoops -conf ../../hadoop-local.xml -D mapreduce.job.maps=4 -D mapreduce.job.reduces=2 \
+  -D stream.num.map.output.key.fields=2   \    #设置第n个separator是key和value的分割点
+  -D mapred.text.key.partitioner.options=-k1,1  \  #-ki,j表示在key内部的从第i到第j个被分割符分割的元素作为分区的key
+  -D mapred.output.key.comparator.class=org.apache.hadoop.mapred.lib.KeyFieldBasedComparator \
+  -D mapred.text.key.comparator.options="-k1n -k2nr" \ #-ki表示k的第i个被分割符号分割的元素，n表示numerical，r表示reverse
+  -input ../input/sample  \
+  -output output \
+  -mapper 'python secondary_sort_map.py' \
+  -partitioner org.apache.hadoop.mapred.lib.KeyFieldBasedPartitioner  \
+  -reducer 'python secondary_sort_reduce.py'  \
+  -file secondary_sort_map.py \
+  -file secondary_sort_reduce.py

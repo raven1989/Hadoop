@@ -1,6 +1,6 @@
 $ jar cvf s2sf.jar WholeFile*.class SmallFilesToSequenceFileConverter.class
 $ hadoop jar s2sf.jar SmallFilesToSequenceFileConverter -conf ../hadoop-local.xml -D mapred.reduce.tasks=2 input output
-#可以看到有几个文件就有一个map，当文件数量为5个的时候我的机器特别卡，为3个的时候很快，可见分片对效率的影响;
+#可以看到有几个文件就有几个map，当文件数量为5个的时候我的机器特别卡，为3个的时候很快，可见分片对效率的影响;
     Launched map tasks=3
     Launched reduce tasks=2
 #使用了两个reducer，所以结果有两个文件

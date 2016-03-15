@@ -1,0 +1,13 @@
+$ jar cvf mtc.jar ClimateRecordParser*.class MaxTemperatureReducer.class MaxTemperatureWithCounters*.class
+$ hadoop jar mtc.jar MaxTemperatureWithCounters -conf ../hadoop-local.xml input/sample output
+#可以看到结果中的计数器值
+  MaxTemperatureWithCounters$Temperature
+      MALFORMED=2
+      MISSING=1
+#和动态计数器值
+        StationId
+            0001=3
+            0002=3
+            0003=3
+
+

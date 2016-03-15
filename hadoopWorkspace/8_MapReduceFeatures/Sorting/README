@@ -1,0 +1,65 @@
+#map在collect之后会将记录写到一个缓冲区，如果缓冲区慢了就开始要写磁盘...
+#仔细研读第六章中的这句话：
+#（每一个mapper）"在写磁盘之前，线程会根据数据最终要传送的reducer把数据划分成相应的分区（partition）。在每个分区中，后台线程按键进行内排序，如果有combiner，它会在排序后的输出上运行..."
+
+$ jar cvf sdp.jar ClimateRecordParser*.class SortDataPreprocessor*.class
+$ hadoop jar sdp.jar SortDataPreprocessor -conf ../hadoop-local.xml input/sample output
+$ hadoop fs -conf ../hadoop-local.xml -text output/part-00001
+#观察这一段结果：
+10  2007 00010 0001
+101 2006 00101 0001
+10  2006 00010 0002
+#可见并没有键内排序；推测是因为程序中设置了没有reducer.下一个程序将会有reducer，到时候对比下结果。
+
+#使用上一个程序的输出ouput下的文件作为输入，_SUCCESS文件是空的，所以不用担心
+$ hadoop SortByTemperatureUsingHashPartitioner -conf ../hadoop-local.xml -D mapred.reduce.tasks=2 output partition_sort_output
+#特意将reducer设置为两个，是为了方便看出结果是部分有序的，而不是全局有序的。
+#程序中使用的是默认的mapper和reducer，不做其他逻辑只是输入再输出;
+#同时由于默认的HashPartitioner的作用，结果做了键内排序.
+
+#Total Sort这个程序始终没跑通
+# hadoop 2.7.1版本，伪分布模式下;
+#不知道是不是全分布模式就没问题，知道的同学请告诉我下。
+#下面是问题具体描述。
+$ hadoop SortByTemperatureUsingTotalOrderPartitioner -D mapred.reduce.tasks=4 file://`pwd`/temp file://`pwd`/total_sort_output
+#报错：
+Exception in thread "main" java.io.IOException: wrong key class: org.apache.hadoop.io.LongWritable is not class org.apache.hadoop.io.IntWritable
+  at org.apache.hadoop.io.SequenceFile$RecordCompressWriter.append(SequenceFile.java:1383)
+    at org.apache.hadoop.mapreduce.lib.partition.InputSampler.writePartitionFile(InputSampler.java:340)
+      at org.apache.hadoop.mapred.lib.InputSampler.writePartitionFile(InputSampler.java:49)
+        at SortByTemperatureUsingTotalOrderPartitioner.run(SortByTemperatureUsingTotalOrderPartitioner.java:66)
+          at org.apache.hadoop.util.ToolRunner.run(ToolRunner.java:70)
+            at org.apache.hadoop.util.ToolRunner.run(ToolRunner.java:84)
+              at SortByTemperatureUsingTotalOrderPartitioner.main(SortByTemperatureUsingTotalOrderPartitioner.java:78)
+#追了一下，可以确定报错的地方是RandomSampler的append方法，源码如下
+    public synchronized void append(Object key, Object val)
+          throws IOException {
+                  if (key.getClass() != keyClass)
+                            throw new IOException("wrong key class: "+key.getClass().getName()
+                                                          +" is not "+keyClass);
+#结合错误可以看出类型不正确的是Object key，它是LongWritable的，而不是我们设置的IntWritable；
+#这个key是获取的samples中的，调用append方法写到指定的_partition文件中，
+#代码是inputSampler的writePartitionFile方法：
+                  public static <K,V> void writePartitionFile(Job job, Sampler<K,V> sampler) 
+                    throws IOException, ClassNotFoundException, InterruptedException {
+                      Configuration conf = job.getConfiguration();
+                      final InputFormat inf = 
+                        ReflectionUtils.newInstance(job.getInputFormatClass(), conf);
+                      int numPartitions = job.getNumReduceTasks();
+                      K[] samples = (K[])sampler.getSample(inf, job);
+                      LOG.info("Using " + samples.length + " samples");
+                      ...
+                        writer.append(samples[k], nullValue);
+                      ...
+#自然会注意到append的是samples[k]，
+#可以看到生成samples是通过调用K[] samples = (K[])sampler.getSample(inf, job);
+#我也试图用同样的方法在自己的代码里调用这个方法，却得到了这个异常：
+Exception in thread "main" java.lang.ClassCastException: [Ljava.lang.Object; cannot be cast to [Lorg.apache.hadoop.io.IntWritable;
+  at SortByTemperatureUsingTotalOrderPartitioner.run(SortByTemperatureUsingTotalOrderPartitioner.java:63)
+#就不知道怎么回事了。
+#只有在reduce.task=1的时候能通过，这种情况下通过查看_partition文件，是SequenceFile，发现其中只有头信息而没有真是的数据;
+#可以推测知道在reduce只有一个的情况下samples只有0个，所以没有写_partition文件，故而没有报错。
+
+#辅助排序
+$ jar cvf mss.jar MaxTemperatureUsingSecondarySort*.class ClimateRecordParser*.class
+$ hadoop jar mss.jar MaxTemperatureUsingSecondarySort -conf ../hadoop-local.xml input/sample output_secondary_sort

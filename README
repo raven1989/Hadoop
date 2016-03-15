@@ -112,7 +112,7 @@ etc/hadoop/yarn-site.xml
 
 4.启动
 格式化HDFS文件系统:
-$ hadoop namenode -format
+$ hdfs namenode -format
 会看到/tmp/hadoop-$user/dfs文件夹，如果格式化有问题删掉这个文件夹再执行一次命令。
 启动守护进程，sbin下：
 $ ./start-dfs.sh

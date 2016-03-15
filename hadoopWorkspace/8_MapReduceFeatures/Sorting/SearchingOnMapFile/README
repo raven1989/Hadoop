@@ -1,0 +1,7 @@
+$ hadoop SortByTemperature2MapFile -conf ../../hadoop-local.xml ../output output.map
+#用外层程序输出的SequenceFile作为输入
+
+$rm output.map/_SUCCESS
+$ hadoop LookupRecordByTemperature -conf ../../hadoop-local.xml output.map 23
+
+$ hadoop LookupAllRecordsByTemperature -conf ../../hadoop-local.xml output.map 13
